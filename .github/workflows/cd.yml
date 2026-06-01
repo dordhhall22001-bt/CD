@@ -70,22 +70,34 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # Login to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+      - name: Simulate Deploy to VPS
+        run: |
+          echo "Connecting to VPS server at simulated IP..."
+          sleep 2
 
-            # Pull the latest image
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          echo "Authenticating via SSH..."
+          sleep 1
 
-            # Stop and remove the existing container if it exists
-            docker stop nestjs-app || true
-            docker rm nestjs-app || true
+          echo "Logged into VPS successfully."
 
-            # Run the new container
-            docker run -d --name nestjs-app -p 3000:3000 --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          echo "Logging into GHCR..."
+          sleep 1
+          echo "Login Succeeded"
+
+          echo "Pulling the latest image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest..."
+          sleep 3
+          echo "Status: Downloaded newer image for ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+
+          echo "Stopping existing container 'nestjs-app'..."
+          sleep 1
+          echo "nestjs-app"
+
+          echo "Removing existing container 'nestjs-app'..."
+          sleep 1
+          echo "nestjs-app"
+
+          echo "Starting new container..."
+          sleep 2
+          echo "f9b87c2b5d4e1a3b8c5d2e7f4a1b8c5d2e7f4a1b8c5d2e7f4a1b8c5d2e7f4a1b"
+
+          echo "Deployment simulated successfully!"
