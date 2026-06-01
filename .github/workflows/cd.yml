@@ -70,22 +70,17 @@ jobs:
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            # Login to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            # Pull the latest image
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      - name: Make scripts executable
+        run: chmod +x scripts/deploy.sh scripts/deploy_base.sh
 
-            # Stop and remove the existing container if it exists
-            docker stop nestjs-app || true
-            docker rm nestjs-app || true
-
-            # Run the new container
-            docker run -d --name nestjs-app -p 3000:3000 --restart unless-stopped ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      - name: Execute simulated deployment script
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          CONTAINER_NAME: nestjs-app
+          PORT: "3000"
+        run: ./scripts/deploy.sh
